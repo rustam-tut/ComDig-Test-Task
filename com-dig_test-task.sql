@@ -6,11 +6,11 @@ $$
 	BEGIN
 		RETURN QUERY
 			SELECT a.attname
-				FROM   pg_index i
-				JOIN   pg_attribute a ON a.attrelid = i.indrelid
-								 	 AND a.attnum = ANY(i.indkey)
-				WHERE  i.indrelid = $1 ::regclass
-				AND    i.indisprimary;
+			  FROM   pg_index i
+			  JOIN   pg_attribute a ON a.attrelid = i.indrelid
+					AND a.attnum = ANY(i.indkey)
+			 WHERE  i.indrelid = $1 ::regclass
+					AND    i.indisprimary;
 	END
 $$ LANGUAGE plpgsql;
 
@@ -21,9 +21,9 @@ $$
 	BEGIN
 	RETURN
 	EXISTS(SELECT column_name 
-			 FROM information_schema.columns 
-			WHERE table_name = tbl AND column_name = col
-		   								AND data_type = 'character varying');
+		 FROM information_schema.columns 
+		WHERE table_name = tbl AND column_name = col
+		   		AND data_type = 'character varying');
  	END
 $$ LANGUAGE plpgsql;
 
@@ -49,22 +49,24 @@ AS $$
 					IF col IN (SELECT primary_key_columns(tbl)) THEN
 						BEGIN
 							EXECUTE
-							format('DELETE FROM %s WHERE NOT is_valid_int4_value(%s)', tbl, col);
+							format('DELETE FROM %s 
+								 WHERE NOT is_valid_int4_value(%s)', tbl, col);
 						END;
 					ELSE
 						BEGIN
 							EXECUTE 
 							format('UPDATE %s SET %s = -1
-								     WHERE NOT is_valid_int4_value(%s) 
-								   			OR %s IS NULL', tbl, col, col, col);
+								 WHERE NOT is_valid_int4_value(%s) 
+								   		OR %s IS NULL', tbl, col, col, col);
 							EXECUTE
-							format('ALTER TABLE %s ALTER COLUMN %s SET NOT NULL', tbl, col);
+							format('ALTER TABLE %s 
+								ALTER COLUMN %s SET NOT NULL', tbl, col);
 						END;
 					END IF;
 				END;
 				EXECUTE
 				format('ALTER TABLE %s
-    				    ALTER COLUMN %s TYPE int4 USING (%s::numeric::int4);', 
+    				    	ALTER COLUMN %s TYPE int4 USING (%s::numeric::int4);', 
 					tbl, col, col, col);
 			END IF;
 		END LOOP;
