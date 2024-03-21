@@ -30,7 +30,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION is_valid_int4_value(val character varying)
 	RETURNS boolean AS
-	'SELECT ($1 ~ ''^(-)?[0-9]{0,9}$'') OR ($1 ~ ''^[0-9]{10}$'' AND $1 <= ''2147483647'')
+	'SELECT ($1 ~ ''^(-)?[0-9]{1,9}$'') OR ($1 ~ ''^[0-9]{10}$'' AND $1 <= ''2147483647'')
 										 OR ($1 ~ ''^(-)?[0-9]{10}$'' AND val <= ''-2147483648'')
 	AS RESULT' LANGUAGE sql;
 	
